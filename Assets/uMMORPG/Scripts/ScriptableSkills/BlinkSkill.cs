@@ -1,50 +1,40 @@
-﻿namespace UnityEngine.Tilemaps.ScriptableSkills
+﻿using UnityEngine.AI;
+
+namespace UnityEngine.Tilemaps.ScriptableSkills
 {
-    namespace UnityEngine.Tilemaps.ScriptableSkills
+    [CreateAssetMenu(menuName = "uMMORPG Skill/Blink", order = 999)]
+    public class Blink : ScriptableSkill
     {
-        [CreateAssetMenu(menuName = "uMMORPG Skill/Blink", order = 999)]
-        public class Blink : ScriptableSkill
+        public override bool CheckTarget(Entity caster)
         {
-            public override bool CheckTarget(Entity caster)
-            {
-                caster.target = caster;
-                return true;
-            }
+            caster.target = caster;
+            return true;
+        }
 
-            public override bool CheckDistance(Entity caster, int skillLevel, out Vector2 destination)
-            {
-                destination = caster.transform.position;
-                return true;
-            }
+        public override bool CheckDistance(Entity caster, int skillLevel, out Vector2 destination)
+        {
+            destination = caster.transform.position;
+            return true;
+        }
 
-            public override void Apply(Entity caster, int skillLevel, Vector2 direction)
-            {
-                var range = castRange.Get(skillLevel);
-                var offset = 0f;
-                if (caster.TryGetComponent<CircleCollider2D>(out var circleCollider))
-                    offset = circleCollider.radius;
+        public override void Apply(Entity caster, int skillLevel, Vector2 direction)
+        {
+            var range = castRange.Get(skillLevel);
 
-                var maxRange = range;
-                var transform = caster.transform;
-                var lookDirection = caster.lookDirection;
-                var startPoint = (Vector2)transform.position;
-                var hits = Physics2D.CircleCastAll(startPoint, offset, lookDirection, range);
+            var position = (Vector2)caster.transform.position;
+            var lookDirection = caster.lookDirection;
 
-                foreach (var hit in hits)
-                {
-                    if (!hit.transform.gameObject.TryGetComponent<TilemapCollider2D>(out _))
-                        continue;
-                    
-                    Debug.Log($"hit point {hit.point}");
-                    
-                    var distanceVector = hit.point - (Vector2)transform.position;
-                    var newMaxRange = Mathf.Abs(Vector2.Dot(lookDirection,distanceVector)) - offset;
-                    maxRange = Mathf.Min(newMaxRange, maxRange);
-                }
+            var offset = 0f;
+            if (caster.TryGetComponent<CircleCollider2D>(out var circleCollider))
+                offset = circleCollider.radius;
 
-                var destination = (Vector2)transform.position + caster.lookDirection * maxRange;
-                caster.movement.Warp(destination);
-            }
+            var destination = position + caster.lookDirection * range;
+
+            if (NavMesh2D.Raycast(position, position + lookDirection * range, out var hit,
+                    NavMesh.AllAreas))
+                destination = hit.position - offset * lookDirection;
+
+            caster.movement.Warp(destination);
         }
     }
 }

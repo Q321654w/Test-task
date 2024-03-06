@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Circle Slash Skill
   m_EditorClassIdentifier: 
   followupDefaultAttack: 0
-  toolTip: 
+  toolTip: <b>{NAME} Lvl {LEVEL}</b>
   image: {fileID: 21300000, guid: 590c9ec1f8e2c46599799b103c07a758, type: 3}
   learnDefault: 1
   showCastBar: 0

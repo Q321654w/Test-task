@@ -22,17 +22,20 @@ namespace UnityEngine.Tilemaps.ScriptableSkills
             var range = castRange.Get(skillLevel);
 
             var position = (Vector2)caster.transform.position;
-            var lookDirection = caster.lookDirection;
-
+            
+            var movementDirection = caster.movement.GetVelocity().normalized;
+            if (movementDirection == Vector2.zero)
+                movementDirection = direction;
+            
             var offset = 0f;
             if (caster.TryGetComponent<CircleCollider2D>(out var circleCollider))
                 offset = circleCollider.radius;
+            
+            var destination = position + movementDirection * range;
 
-            var destination = position + caster.lookDirection * range;
-
-            if (NavMesh2D.Raycast(position, position + lookDirection * range, out var hit,
+            if (NavMesh2D.Raycast(position, position + movementDirection * (range + offset), out var hit,
                     NavMesh.AllAreas))
-                destination = hit.position - offset * lookDirection;
+                destination = hit.position - offset * movementDirection;
 
             caster.movement.Warp(destination);
         }

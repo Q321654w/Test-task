@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Blink Skill
   m_EditorClassIdentifier: 
   followupDefaultAttack: 0
-  toolTip: 
+  toolTip: <b>{NAME} Lvl {LEVEL}</b>
   image: {fileID: 21300000, guid: 12c88845cc65f4c2f83608de60569403, type: 3}
   learnDefault: 1
   showCastBar: 0
